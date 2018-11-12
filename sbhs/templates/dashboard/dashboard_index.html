@@ -1,0 +1,46 @@
+{% extends "account/home.html" %}
+{% load staticfiles %}
+{% block title %}
+	Dashboard
+{% endblock %}
+{% block headerfiles %}
+
+        <script src="{% static 'js/jquery-ui.js' %}"></script> 
+        <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}"/>
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>
+{% endblock %}
+{% block content %}
+<br>
+<div class="row">
+    <div class="col-md-2 col-md-2 sidebar">
+        <ul class="nav nav-sidebar nav-stacked">
+            <li class = "active">
+                <a href="{% url 'moderator_dashboard' %}">Show all Boards</a>
+            </li>
+            <li>
+                <a href="{% url 'all_bookings' %}">Show all Bookings</a>
+            </li>
+            <li>
+                <a href="{% url 'all_images' %}">Show all Images</a>
+            </li>
+            <li>
+                <a href="{% url 'test_boards' %}">Test Boards</a>
+            </li>
+            <li>
+                <a href="{% url 'update_mid' %}">Update MID</a>
+            </li>
+            <li>
+                <a href="{% url 'fetch_logs' %}">Fetch Logs</a>
+            </li>
+            <li>
+                <a href="{% url 'logs_folder_index' %}">Download Experiment Directory</a>
+            </li>
+        </ul>
+    </div> 
+       
+<div class="col-md-8 col-md-offset-1 main">
+{% block main %}
+{% endblock %}
+</div>
+</div>
+{% endblock %}

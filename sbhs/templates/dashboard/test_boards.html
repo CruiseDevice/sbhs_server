@@ -1,0 +1,68 @@
+{% extends 'dashboard/dashboard_index.html' %}
+{% load staticfiles %}
+{% load custom_filter %}
+{% block title %}
+    Test Boards
+{% endblock %}
+
+{% block style_block %}
+	<style type="text/css">
+		.highlight{
+			background-color: lightblue;
+		}
+
+	</style>
+{% endblock %}
+{% block main %}
+<div class = "container">
+	<div class = "row">
+		<div class = "span7">
+			{% if dead_servers %}
+			<div class="alert alert-danger">
+				These SBHS servers did not respond - <br/>
+				<strong>{{dead_servers|join:", "}}</strong>
+			</div>
+			{% endif %}
+			<table class = "table table-striped" id = "tableId">
+				<thead>
+					<tr>
+						<th>Board MID</th>
+						<th>Status</th>
+						<th>Occupied</th>
+						<th>Temperature</th>
+						<th>Set Heat</th>
+						<th>Set Fan</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for device in all_devices %}
+					<form class = "form-horizontal" action = "{% url 'update_board_values' device.board.mid %}" method="POST" name="form_{{device.board.mid}}" autocomplete="off">
+						{% csrf_token %}
+					<tr>
+						<td>{{device.board.mid}}</td>
+						<td><span style="cursor: pointer;" class = "label label-{% if device.board.online %}success{% else %}danger{% endif %}">
+						{% if device.board.online %}Online{% else %}Offline{% endif %}</span></td>
+						{% check_board_occupancy device.board.mid as slot_status %}
+						<td><span style="cursor: pointer;" class = "label label-{% if slot_status %}danger{% else %}success{% endif %}">
+						{% if slot_status %}Occupied{% else %}Vacant{% endif %}</span></td>
+						<td>{{device.temp.temp}}</td>
+						<td><input type="text" name="set_heat" id="set_heat_{{device.board.mid}}"/></td>
+						<td><input type="text" name="set_fan" id="set_fan_{{device.board.mid}}"/></td>
+						<td><button class="btn btn-primary"> Submit </button></td>
+					</tr>
+					</form>	
+					{% endfor %}
+				</tbody>
+			</table>
+			<br/><br/>
+			<form class = "form-horizontal" action = "" method="POST" autocomplete="off"> 
+				{% csrf_token %}
+				<span>
+				<center><button class = "btn btn-primary" name="update_boards" value="update_boards">Update all boards</button>
+				<button class = "btn btn-primary" name="reset_all" value="reset_all">Reset all boards</button></center>
+				</span>
+			</form>
+		</div>
+
+{% endblock %}

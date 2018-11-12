@@ -1,0 +1,121 @@
+{% extends "account/home.html" %}
+{% load staticfiles %}
+{% load custom_filter %}
+{% block title %}
+	Book Slot
+{% endblock %}
+{% block content %}
+	{% block headerfiles %}
+		<script src = "{% static 'js/jquery.datetimepicker.full.min.js' %}"></script>
+
+		<script type="{% static 'js/jquery-ui.js' %}"></script>	
+		<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}">
+		<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	{% endblock %}
+	<br>	
+	<div class="row">
+	    <div class="col-sm-3 col-md-2 sidebar">
+	    	<ul class="nav nav-sidebar nav-stacked">
+				<li class = "active">
+					<a href="#tab_a" data-toggle="pill">Create Slot</a>
+				</li>
+				<li>
+					<a href="#tab_b" data-toggle="pill">Slot History</a>
+				</li>
+			</ul>
+		</div>
+		<div class="tab-content col-md-10">
+			<div class = "tab-pane active" id="tab_a">
+				<br>
+				<h4>Book future slots:</h4>
+				<form class = "form-horizontal" action = "" method="POST" autocomplete="off"> 
+					<center>
+					<div class = "form-group">
+						{% csrf_token %}
+						<b>Book for a given date:</b><br/>
+									{{form.as_p}}
+					<button class="btn btn-primary" type="submit" name='book_date' value='book_date'>Book Date</button><br/>
+					<center>OR</center>
+					<b>Book for current date and time</b><br/>
+
+					<button class="btn btn-primary" type="submit" name="book_now" value="book_now">Book Now</button><br/>
+					</div>
+					</center>
+
+					
+				</form>
+				<div class = "tab-content col-md-10">
+					<table class = "table table-striped">
+						<thead>
+							<tr>
+								<th>
+									Sr.No
+								</th>
+								<th>
+									Already Booked Slots
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for slot in board_all_booked_slots %}
+								<tr>
+									<td>{{forloop.counter}}</td>
+									<td>{{slot.start_time}} : {{slot.end_time}} </td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class = "tab-pane col-md-10" id="tab_b">
+				<form action="" method="POST">
+					{%csrf_token %}
+						<table class="table table-striped">
+
+						<thead>
+							<tr>
+								<b><th></th></b>
+								<b><th>Start Time of a Slot</th></b>
+								<b><th>Duration</th></b>
+								<b><th>Action</th></b>
+							</tr>	
+						</thead>
+						<tbody>
+						{% for h in history %}							 
+								<tr>
+									{%if h.start_time >= now %}
+									<td><input type="checkbox" name="slots" value="{{h.id}}"/></td>
+									{% else %}
+									<td><input type="hidden"/></td>
+
+									{% endif %}
+									<td>{{h.start_time}}</td>
+									<td>{{h.end_time}}</td>
+									{% compare_slot_time h.start_time h.end_time now as slot_status %}
+									{%if slot_status == "pending" %}
+									<td><p class="label label-warning">Pending</p></td>
+									{% elif slot_status == "ongoing" %}
+									<td><p class="label label-success">Ongoing</p></td>								
+									{% else %}
+									<td><p class="label label-danger">Finished</p></td>
+									{% endif %}
+								</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+					<button class="btn btn-danger" type="submit" name="delete" value="delete">Delete</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<script type="text/javascript">
+		var dateToday = new Date();
+		$(function(){
+			$(".datetimepicker").datetimepicker({
+				format:'Y-m-d H:i:s',
+				minDate: dateToday, // got this from https://stackoverflow.com/a/9978261/4883946
+			});
+		})
+	</script>
+{% endblock %}
